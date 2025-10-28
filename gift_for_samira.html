@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Gift for Samira — Made by Mehboob</title>
+<style>
+  :root{ --blue:#0b61ff; --card:#fff0f7; --accent:#ff5fa8; --muted:#071028; }
+  html,body{height:100%;margin:0;font-family:system-ui, 'Poppins', sans-serif;background:linear-gradient(180deg,var(--blue),#4aa1ff);color:#072;overflow:hidden;}
+  .stage{position:relative;width:100%;height:100vh;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:18px;padding:20px;box-sizing:border-box;}
+  .butterflies{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+  .butterfly{position:absolute;font-size:26px;opacity:0.9;animation:float 8s linear infinite;transform-origin:center;}
+  @keyframes float{0%{transform: translateY(-10vh) scale(0.9) rotate(0deg);}50%{transform: translateY(20vh) scale(1.1) rotate(30deg);}100%{transform: translateY(90vh) scale(0.9) rotate(-10deg);}}
+  .card{position:relative;z-index:2;background:rgba(255,255,255,0.12);backdrop-filter: blur(6px);padding:18px;border-radius:14px;box-shadow:0 12px 40px rgba(2,6,23,0.28);width:920px;max-width:95%;text-align:center;color:#fff}
+  h1{margin:6px 0 2px 0;font-size:26px}
+  p.lead{margin:0 0 12px 0;opacity:0.95}
+  .gifts{display:flex;gap:18px;justify-content:center;align-items:center;margin-top:8px;flex-wrap:wrap}
+  .giftbox{width:160px;height:160px;background:linear-gradient(180deg,#fff,#ffe6f4);border-radius:12px;display:flex;align-items:center;justify-content:center;flex-direction:column;position:relative;cursor:pointer;box-shadow:0 8px 30px rgba(0,0,0,0.18);color:#071028;font-weight:800}
+  .giftbox .bow{width:120px;height:28px;background:linear-gradient(90deg,#ff5fa8,#ff9ac6);border-radius:8px;position:absolute;top:8px;left:50%;transform:translateX(-50%);box-shadow:0 6px 18px rgba(179,48,120,0.12)}
+  .giftbox.opened{transform:translateY(-8px) scale(1.02);}
+  .btn{margin-top:10px;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;background:linear-gradient(90deg,#ffd166,#ff9ac6);font-weight:800}
+  .modal{position:relative;margin-top:12px;background:rgba(255,255,255,0.95);color:#071028;padding:12px;border-radius:10px;min-height:80px;max-width:780px;display:none;justify-content:center;align-items:center;text-align:left;white-space:pre-wrap}
+  .modal.show{display:flex;animation:fadeIn 320ms ease-out}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+  .kiss{position:absolute;font-size:48px;z-index:40;left:50%;transform:translateX(-50%);top:30%;pointer-events:none;opacity:0}
+  .big-heart{font-size:96px;color:#ff5fa8;display:inline-block;margin-top:6px;opacity:0;transform:scale(0.6);transition:all 420ms ease-out}
+  .big-heart.show{opacity:1;transform:scale(1)}
+  .scrollbox{position:relative;overflow:hidden;background:#fff;border-radius:8px;padding:10px;color:#071028;margin-top:10px;width:100%}
+  .scrolltext{display:inline-block;white-space:nowrap;padding-left:100%;animation:scrollLTR 18s linear forwards;font-weight:700}
+  @keyframes scrollLTR{from{transform:translateX(0)}to{transform:translateX(-100%)}}
+  .particle-canvas{position:fixed;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:30}
+  .final{margin-top:12px;font-weight:800;color:#fff;font-size:18px}
+  .credit{position:fixed;left:16px;bottom:12px;color:#fff;font-weight:700;z-index:60}
+  .hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="butterflies" id="butterflies"></div>
+<div class="stage" id="stage">
+  <div class="card" id="card">
+    <h1>Here is ur gift</h1>
+    <p class="lead">Click a gift box to open it — each box has a surprise inside 💝</p>
+    <div class="gifts">
+      <div class="giftbox" id="box1" data-box="1" aria-label="Gift 1">
+        <div class="bow"></div>
+        <div>Gift 1</div>
+        <button class="btn openBtn">Open</button>
+      </div>
+      <div class="giftbox" id="box2" data-box="2" aria-label="Gift 2">
+        <div class="bow"></div>
+        <div>Gift 2</div>
+        <button class="btn openBtn">Open</button>
+      </div>
+    </div>
+    <div class="modal" id="modal"></div>
+    <div class="kiss" id="kiss">💋</div>
+    <div class="big-heart" id="bigHeart">❤️</div>
+    <div class="final hidden" id="finalMsg"></div>
+  </div>
+</div>
+<canvas class="particle-canvas" id="pCanvas"></canvas>
+<div class="credit">Made by Mehboob for Samira jaan</div>
+<script>
+const butterflies = document.getElementById('butterflies');
+for(let i=0;i<28;i++){
+  const b = document.createElement('div');
+  b.className = 'butterfly';
+  b.textContent = '🦋';
+  const left = Math.random()*100;
+  const delay = Math.random()*-8;
+  const dur = 6 + Math.random()*6;
+  b.style.left = left + '%';
+  b.style.top = (-10 + Math.random()*20) + '%';
+  b.style.opacity = 0.6 + Math.random()*0.4;
+  b.style.fontSize = (18 + Math.random()*28) + 'px';
+  b.style.animationDuration = dur + 's';
+  b.style.animationDelay = delay + 's';
+  b.style.transform = 'rotate(' + (Math.random()*40-20) + 'deg)';
+  butterflies.appendChild(b);
+}
+const box1 = document.getElementById('box1');
+const box2 = document.getElementById('box2');
+const modal = document.getElementById('modal');
+const kiss = document.getElementById('kiss');
+const bigHeart = document.getElementById('bigHeart');
+const finalMsg = document.getElementById('finalMsg');
+const pCanvas = document.getElementById('pCanvas');
+const pCtx = pCanvas.getContext('2d');
+let particleList = [];
+function resizeCanvas(){ pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight; }
+window.addEventListener('resize', resizeCanvas); resizeCanvas();
+function spawnParticles(x,y, color='#ff5fa8', count=40, shape='circle'){
+  for(let i=0;i<count;i++){
+    particleList.push({
+      x, y,
+      vx: (Math.random()-0.5)*6,
+      vy: (Math.random()-1.5)*6,
+      life: 50 + Math.random()*80,
+      size: 6 + Math.random()*10,
+      color: color,
+      shape: shape
+    });
+  }
+}
+function updateParticles(){
+  pCtx.clearRect(0,0,pCanvas.width,pCanvas.height);
+  for(let i=particleList.length-1;i>=0;i--){
+    const p = particleList[i];
+    p.x += p.vx; p.y += p.vy; p.vy += 0.12; p.life--;
+    pCtx.fillStyle = p.color;
+    pCtx.beginPath();
+    pCtx.arc(p.x, p.y, p.size/2, 0, Math.PI*2);
+    pCtx.fill();
+    if(p.life<=0) particleList.splice(i,1);
+  }
+  requestAnimationFrame(updateParticles);
+}
+requestAnimationFrame(updateParticles);
+function openBox(boxNum){
+  const boxEl = boxNum===1? box1: box2;
+  boxEl.classList.add('opened');
+  const bow = boxEl.querySelector('.bow');
+  bow.animate([{transform:'translateY(0)'},{transform:'translateY(-24px)'}],{duration:420,fill:'forwards'});
+  if(boxNum===1){
+    showModal(`I promise I'll always be with you. I love you. I'll be with you in every life if I get the chance. I just want to be yours. It would be my pleasure.`);
+    showKiss(20000);
+    spawnParticles(window.innerWidth*0.5, window.innerHeight*0.35, '#ff5fa8', 120);
+    setTimeout(()=>{ hideModal(); }, 22000);
+  } else {
+    showModal(`(Opening second gift...)`);
+    showKiss(10000);
+    spawnParticles(window.innerWidth*0.55, window.innerHeight*0.35, '#72c0ff', 80);
+    setTimeout(()=>{
+      modal.innerHTML = '';
+      const scrollbox = document.createElement('div');
+      scrollbox.className = 'scrollbox';
+      const st = document.createElement('div');
+      st.className = 'scrolltext';
+      st.textContent = `I am giving you my heart. I have nothing else to give. I can only give you my love, time and heart. Take care of my heart, never let it break. I am sure you will manage it, it is yours now.`;
+      scrollbox.appendChild(st);
+      modal.appendChild(scrollbox);
+      modal.classList.add('show');
+      setTimeout(()=> bigHeart.classList.add('show'), 1200);
+      spawnParticles(window.innerWidth*0.6, window.innerHeight*0.45, '#ff5fa8', 160);
+      setTimeout(()=>{
+        finalMsg.textContent = `Happiest birthday jaan — enjoy your special day and enjoy your every moment. Allah bless you 💞\n\nI love you more, I love you beyond the universe. I'm so happy it's ur birthday 🎆`;
+        finalMsg.classList.remove('hidden');
+      }, 5200);
+    }, 1200);
+  }
+}
+function showModal(text){
+  modal.textContent = text;
+  modal.classList.add('show');
+}
+function hideModal(){ modal.classList.remove('show'); modal.textContent = ''; }
+let kissTimer = null;
+function showKiss(ms=10000){
+  kiss.style.opacity = 1;
+  kiss.animate([{transform:'translateY(0) scale(1)', opacity:1},{transform:'translateY(-80px) scale(1.6)', opacity:0}],{duration:1200,iterations:8});
+  const start = Date.now();
+  kissTimer = setInterval(()=>{ spawnParticles(window.innerWidth*0.5 + (Math.random()-0.5)*200, window.innerHeight*0.3 + Math.random()*200, '#ff9ac6', 20); }, 600);
+  setTimeout(()=>{ clearInterval(kissTimer); kiss.style.opacity = 0; }, ms);
+}
+document.querySelectorAll('.openBtn').forEach(btn=>{ btn.addEventListener('click', (e)=>{ const box = e.target.closest('.giftbox'); const num = Number(box.dataset.box); openBox(num); }); });
+const h1 = document.querySelector('h1'); h1.animate([{opacity:0},{opacity:1}],{duration:900,fill:'forwards'});
+let started = false;
+function begin(e){ if(started) return; started = true; spawnParticles(window.innerWidth*0.5, window.innerHeight*0.25, '#ffd166', 60); }
+document.addEventListener('click', begin, {once:true}); document.addEventListener('touchstart', begin, {once:true});
+</script>
+</body>
+</html>
